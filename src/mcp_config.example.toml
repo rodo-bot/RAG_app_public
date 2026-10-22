@@ -1,0 +1,16 @@
+[mcp_servers.rag_knowledge_base]
+command = "C:\\path\\to\\RAG_app\\RAG Knowledge Base MCP.exe"
+cwd = "C:\\path\\to\\RAG_app"
+enabled = true
+required = false
+startup_timeout_sec = 60
+tool_timeout_sec = 120
+default_tools_approval_mode = "auto"
+enabled_tools = [
+  "search_knowledge_base",
+  "get_source_page",
+  "find_entity",
+  "list_pdf_documents",
+  "get_document_outline",
+  "build_analysis_context",
+]

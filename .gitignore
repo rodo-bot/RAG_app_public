@@ -33,3 +33,14 @@ node_modules/
 dist/
 build/
 *.log
+
+# RAG app: runtime data, model cache, user documents, built executables
+src/data/
+src/models/
+src/Output/
+src/Sync Library/*
+!src/Sync Library/.gitkeep
+src/.venv/
+*.exe
+*.lnk
+*.spec
