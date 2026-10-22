@@ -1,5 +1,6 @@
 import tempfile
 import unittest
+import sqlite3
 from pathlib import Path
 from unittest.mock import patch
 
@@ -34,6 +35,30 @@ class FailingEmbedder:
 
 
 class RAGTests(unittest.TestCase):
+    def test_numpy_vector_fallback_when_sqlite_extensions_are_unavailable(self):
+        with tempfile.TemporaryDirectory() as temp_name:
+            root = Path(temp_name)
+            with patch("ragkb.rag_store.sqlite_vec.load", side_effect=sqlite3.OperationalError("disabled")):
+                db = RAGDB(root / "rag.db", embedder=FakeEmbedder())
+            self.assertFalse(db._sqlite_vec_available)
+            source = root / "Motor Manual.pdf"
+            document_id = db.upsert_document(source, "abc", 10, 1)
+            content = "Motor overload relay troubleshooting"
+            record = {
+                "page_number": 1, "page_type": "narrative", "text_source": "embedded",
+                "embedded_text": content, "ocr_text": "", "search_text": content,
+                "char_count": len(content), "word_count": len(content.split()),
+                "image_count": 0, "width_points": 600.0, "height_points": 800.0,
+                "confidence": 0.96, "red_markup_score": 0.0,
+                "preview_path": "data/previews/example.webp",
+                "thumbnail_path": "data/thumbnails/example.webp", "metadata": {},
+            }
+            db.add_page(document_id, source.name, record, [])
+            db.finish_document(document_id, 1)
+            db.embed_document(document_id)
+            results = db.semantic_hits(next(FakeEmbedder().query_embed("motor")))
+            self.assertEqual(results[0]["content"].split(". ", 1)[-1], content)
+
     def test_red_markup_score_preserves_color_classification(self):
         from PIL import Image, ImageDraw
 
