@@ -1,0 +1,20 @@
+# Runs when a release tag like v1.3 is pushed.
+# Fill in the build step per app; the AI assistant will customize this when the app needs
+# downloadable builds for Windows / macOS / Linux.
+name: Release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        shell: bash
+        run: echo "No build step yet for ${{ matrix.os }}"
