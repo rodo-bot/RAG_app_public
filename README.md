@@ -1,6 +1,6 @@
 # RAG App
 
-Status: In progress
+Status: Working
 
 ## What it does
 A local knowledge base for PDF, Word, Excel, CSV and image files. It indexes your documents (with OCR and page previews), then lets an AI assistant search them by exact words and by meaning, and cite the exact page or row. Everything runs on your own computer; no paid services or API keys.

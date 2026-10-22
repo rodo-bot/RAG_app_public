@@ -52,7 +52,7 @@ jobs:
           cp MACOS_README.md "$package/README.md"
           cp LLM_INSTRUCTIONS.md "$package/"
           ditto -c -k --sequesterRsrc --keepParent "$package" "$package.zip"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: RAG-Knowledge-Base-macOS-${{ matrix.architecture }}
           path: src/RAG-Knowledge-Base-macOS-${{ matrix.architecture }}.zip
@@ -63,7 +63,7 @@ jobs:
     needs: test-and-build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: RAG-Knowledge-Base-macOS-*
           path: artifacts
