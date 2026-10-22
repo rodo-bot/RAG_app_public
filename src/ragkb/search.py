@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import sqlite3
-from pathlib import Path
 from typing import Any
 
 from .db import KnowledgeDB
@@ -79,10 +78,16 @@ class KnowledgeSearch:
             # engineering page. If strict FTS finds nothing, retrieve pages matching the
             # meaningful terms so the LLM still receives evidence to reason over.
             meaningful_tokens = []
-            for token in query_tokens(query):
+            raw_tokens = query_tokens(query)
+            for token in raw_tokens:
                 lowered = token.lower()
                 if len(lowered) >= 3 and lowered not in QUERY_STOP_WORDS and lowered not in meaningful_tokens:
                     meaningful_tokens.append(lowered)
+            identifier_tokens = [
+                token.lower() for token in raw_tokens
+                if any(character.isdigit() for character in token)
+                or any(character.isupper() for character in token[1:])
+            ]
             if not rows and len(meaningful_tokens) >= 2:
                 any_expression = " OR ".join(f'"{token}"' for token in meaningful_tokens)
                 broad_parameters: list[Any] = [any_expression]
@@ -100,6 +105,14 @@ class KnowledgeSearch:
                     lowered_text = str(row["search_text"]).lower()
                     matched = sum(token in lowered_text for token in meaningful_tokens)
                     coverage = matched / len(meaningful_tokens)
+                    if identifier_tokens and not any(token in lowered_text for token in identifier_tokens):
+                        continue
+                    # An OR query is only a candidate generator. Requiring more than
+                    # one meaningful term keeps long questions from returning pages
+                    # that happen to contain a single generic word such as "system".
+                    minimum_matches = 2 if len(meaningful_tokens) <= 5 else 3
+                    if matched < minimum_matches:
+                        continue
                     item = self._row_result(row, query, float(row["rank"]) + 8.0 - (coverage * 6.0), "keyword_evidence")
                     item["query_term_coverage"] = round(coverage, 3)
                     results[page_id] = item

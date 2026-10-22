@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath $PSScriptRoot
-$runtime = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
+$runtime = Join-Path $PSScriptRoot 'python-runtime\python.exe'
 if (-not (Test-Path -LiteralPath $runtime)) { $runtime = 'python' }
 $python = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
 if (-not (Test-Path -LiteralPath $python)) { & $runtime -m venv --system-site-packages '.venv' }

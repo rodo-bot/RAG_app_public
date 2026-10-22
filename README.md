@@ -19,4 +19,6 @@ Not supported yet (the launch scripts are PowerShell for Windows).
 ## Notes
 - The sync folder is **`src\Sync Library`**, inside the app's own folder. It starts empty and is not stored in GitHub, and neither are the database (`src\data`), model cache, or built `.exe` files; they are created on your computer.
 - Full guide: `docs/APP_GUIDE.md`. Instructions for AI assistants: `src/LLM_INSTRUCTIONS.md`.
-- Unit tests: on a Linux test run, 8 of 31 tests failed; the same tests failed on the original code, so this is not from the upload.
+- OCR needs Tesseract. Install it from https://github.com/UB-Mannheim/tesseract/wiki, or copy a portable Tesseract into `src\tools\tesseract` (not stored in GitHub, about 112 MB).
+- The optional GPU environment (`gpu-venv`) is created by `setup_gpu.ps1` inside the app folder.
+- Tests: run `python -m unittest discover -s tests` from `src`.

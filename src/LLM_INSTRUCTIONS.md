@@ -6,7 +6,7 @@ Read this file when the user asks you to answer from the **RAG Knowledge Base**.
 
 - Use the MCP server named **`rag_knowledge_base`**. It is separate from the original **`searchpdfs`** server. When the user requests RAG Knowledge Base, direct your searches to `rag_knowledge_base`, not `searchpdfs` or raw SQLite queries.
 - The MCP server is launched by `RAG Knowledge Base MCP.exe` in this folder. In this Codex workspace it is registered in the parent `.codex/config.toml`.
-- The app reads the `Sync Library` folder inside this app's folder, including its subfolders. `settings.json` (`sync_library`) defines the active source folder and can be changed to another relative or absolute path.
+- The app reads the `Sync Library` folder inside this RAG application folder, including its subfolders. `settings.json` defines that active source folder.
 - This app stores its **own** index in `data/knowledge.db`. The original SearchPDFs database is separate. Each app must be synced separately.
 
 ## Connecting a new LLM client

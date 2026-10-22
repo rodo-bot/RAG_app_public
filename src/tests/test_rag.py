@@ -29,6 +29,9 @@ class FailingEmbedder:
     def embed(self, _texts):
         raise RuntimeError("simulated GPU failure")
 
+    def query_embed(self, _query):
+        raise RuntimeError("simulated query embedding failure")
+
 
 class RAGTests(unittest.TestCase):
     def test_red_markup_score_preserves_color_classification(self):
@@ -92,6 +95,29 @@ class RAGTests(unittest.TestCase):
         chunks = split_chunks(" ".join(words))
         self.assertEqual(len(chunks), 2)
         self.assertEqual(chunks[0].split()[-40:], chunks[1].split()[:40])
+
+    def test_hybrid_search_falls_back_when_query_embedding_fails(self):
+        with tempfile.TemporaryDirectory() as temp_name:
+            root = Path(temp_name)
+            db = RAGDB(root / "rag.db", embedder=FakeEmbedder())
+            source = root / "Motor Manual.pdf"
+            document_id = db.upsert_document(source, "abc", 10, 1)
+            content = "Motor overload relay troubleshooting"
+            record = {
+                "page_number": 1, "page_type": "narrative", "text_source": "embedded",
+                "embedded_text": content, "ocr_text": "", "search_text": content,
+                "char_count": len(content), "word_count": len(content.split()),
+                "image_count": 0, "width_points": 600.0, "height_points": 800.0,
+                "confidence": 0.96, "red_markup_score": 0.0,
+                "preview_path": "data/previews/example.webp",
+                "thumbnail_path": "data/thumbnails/example.webp", "metadata": {},
+            }
+            db.add_page(document_id, source.name, record, [])
+            db.finish_document(document_id, 1)
+            db.embed_document(document_id)
+            db._embedder = FailingEmbedder()
+            results = RAGSearch(db).search("motor overload", mode="hybrid")
+            self.assertEqual(results[0]["document_name"], source.name)
 
     def test_sync_search_resync_and_remove(self):
         with tempfile.TemporaryDirectory() as temp_name:

@@ -44,3 +44,7 @@ src/.venv/
 *.exe
 *.lnk
 *.spec
+src/gpu-venv/
+src/python-runtime/
+src/tools/tesseract/
+src/delete/

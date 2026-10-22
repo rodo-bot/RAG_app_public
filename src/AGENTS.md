@@ -1,6 +1,6 @@
 # RAG Knowledge Base LLM workflow
 
-This folder is a separate local RAG application with its own SQLite evidence and vector index. `settings.json` selects the read-only source library (default: the `Sync Library` folder in this app's folder); `data` and `models` belong to this app.
+This folder is a separate local RAG application with its own SQLite evidence and vector index. `settings.json` selects the read-only source library; `data` and `models` belong to this app.
 
 Read `LLM_INSTRUCTIONS.md` for the complete retrieval and citation workflow when the user asks you to use this RAG knowledge base.
 

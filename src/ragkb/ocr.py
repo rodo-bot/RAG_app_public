@@ -13,7 +13,6 @@ from .paths import APP_ROOT
 
 KNOWN_TESSERACT_PATHS = (
     APP_ROOT / "tools" / "tesseract" / "tesseract.exe",
-    APP_ROOT.parent / "tools" / "tesseract" / "tesseract.exe",
     Path(r"C:\Program Files\Tesseract-OCR\tesseract.exe"),
     Path(r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"),
 )

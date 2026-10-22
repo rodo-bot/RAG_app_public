@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Stop'
-$gpuPythonw = Join-Path $env:LOCALAPPDATA 'RAGKnowledgeBase\gpu-venv\Scripts\pythonw.exe'
+$gpuPythonw = Join-Path $PSScriptRoot 'gpu-venv\Scripts\pythonw.exe'
 if (Test-Path -LiteralPath $gpuPythonw) {
     $entry = Join-Path $PSScriptRoot 'RAG Knowledge Base Desktop.pyw'
     Start-Process -FilePath $gpuPythonw -ArgumentList ('"' + $entry + '"') -WorkingDirectory $PSScriptRoot -WindowStyle Hidden

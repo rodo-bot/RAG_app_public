@@ -4,9 +4,12 @@ This is a separate local application built from the SearchPDFs extraction workfl
 
 ## Open and sync
 
-After cloning, run `setup.ps1` and `build_app.ps1` to create the environment, download the model, and build the executables (they are not stored in the repo), then double-click **RAG Knowledge Base.exe**. The app uses `http://127.0.0.1:8766`, so it can run alongside SearchPDFs on port 8765. Click **Sync Library** to build its own index in this folder's `data` directory. The first sync of a large library will render and embed every page and can take a long time. Later syncs skip unchanged files without reopening them or recreating vectors.
+Double-click **RAG Knowledge Base.exe**. The app uses `http://127.0.0.1:8766`, so it can run alongside SearchPDFs on port 8765. Click **Sync Library** to build its own index in this folder's `data` directory. The first sync of a large library will render and embed every page and can take a long time. Later syncs skip unchanged files without reopening them or recreating vectors.
 
-`settings.json` points `sync_library` to the `Sync Library` folder inside this app's own folder (`"Sync Library"`) as a **read-only source**. Put the files you want indexed there before syncing; they are never modified. To use a different folder, set `sync_library` to a relative path (resolved against this folder) or an absolute path. Switching sources makes the next sync mirror the selected folder and remove records for files no longer in it.
+`settings.json` points to the **`Sync Library` inside this application folder**.
+The database paths were migrated to this internal copy without re-extracting,
+OCRing, rendering, or embedding the existing collection. Add, replace, or
+remove future source documents in this internal folder before syncing.
 
 ### Faster sync and optional GPU embedding
 
@@ -16,12 +19,12 @@ After a sync, expand **Sync timing** to see the slowest files and the actual
 embedding device. Source files are never edited.
 
 On a Windows PC with a supported NVIDIA GPU, run `setup_gpu.ps1` once. It
-installs the optional CUDA runtime under `%LOCALAPPDATA%\RAGKnowledgeBase`,
-outside OneDrive, and verifies that the model actually uses CUDA. Close the
+installs the optional CUDA runtime in `gpu-venv` inside this application
+folder and verifies that the model actually uses CUDA. Close the
 existing RAG app, then open **RAG Knowledge Base GPU.lnk** to use the same
 database and Sync Library with GPU embeddings. **RAG Knowledge Base CPU.exe**
-contains the same sync improvements for CPU use; the original executable is
-untouched. With `"embedding_device": "auto"`, new or changed documents use
+contains the same sync improvements for CPU use. With
+`"embedding_device": "auto"`, new or changed documents use
 CUDA when available and the CPU otherwise. Existing vectors need no rebuild.
 
 The GPU accelerates embeddings; PDF extraction, rendering, OCR, and SQLite
@@ -36,6 +39,14 @@ writes still run on the CPU. **Sync timing** shows which stage limits each run.
 - Search results and analysis contexts include document names and exact PDF pages, Word sections, spreadsheet rows, or image frames. Use **Inspect source** or `get_source_page` for images and uncertain OCR.
 
 The embedding model is cached in `models`. It has already been downloaded for this installation and runs without a network connection. The application does not use an OpenAI API key, paid embeddings, hosted vector database, or local LLM. It never sends source text to an embedding service.
+
+The runtime components are colocated with the application: source documents in
+`Sync Library`, the index and previews in `data`, embeddings in `models`, OCR in
+`tools/tesseract`, the CPU development environment in `.venv`, the optional
+CUDA environment in `gpu-venv`, and their base interpreter in
+`python-runtime`. Moving the whole application folder preserves these relative
+runtime relationships; update the absolute MCP configuration path if the
+folder itself is moved.
 
 ## Connect an LLM
 

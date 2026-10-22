@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 from collections import defaultdict
+import logging
 from typing import Any
 
 from .rag_store import RAGDB
 from .search import KnowledgeSearch
 from .text import clean_text
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 class RAGSearch(KnowledgeSearch):
@@ -28,7 +32,9 @@ class RAGSearch(KnowledgeSearch):
         if not query:
             return []
         limit = max(1, min(int(limit), 100))
+        mode = str(mode).lower()
         mode = mode if mode in {"hybrid", "lexical", "semantic"} else "hybrid"
+        version_scope = "all" if str(version_scope).lower() == "all" else "current"
         lexical = super().search(query, limit=max(limit * 4, 50), page_type=page_type,
                                  version_scope=version_scope) if mode != "semantic" else []
         if mode == "lexical":
@@ -37,8 +43,14 @@ class RAGSearch(KnowledgeSearch):
         rag_db: RAGDB = self.db  # type: ignore[assignment]
         if not rag_db.has_embeddings():
             return lexical[:limit]
-        query_vector = next(rag_db.embedder.query_embed(query))
-        chunks = rag_db.semantic_hits(query_vector, limit=max(limit * 8, 80))
+        try:
+            query_vector = next(rag_db.embedder.query_embed(query))
+            chunks = rag_db.semantic_hits(query_vector, limit=max(limit * 8, 80))
+        except Exception as exc:
+            if mode == "semantic":
+                raise
+            LOGGER.warning("Semantic search unavailable; using lexical results: %s", exc)
+            return lexical[:limit]
         semantic: dict[int, dict[str, Any]] = {}
         for rank, chunk in enumerate(chunks, start=1):
             if version_scope != "all" and not chunk["is_current"]:

@@ -1,13 +1,11 @@
 $ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath $PSScriptRoot
 
-$runtime = Join-Path $env:USERPROFILE '.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
+$runtime = Join-Path $PSScriptRoot '.venv\Scripts\python.exe'
 if (-not (Test-Path -LiteralPath $runtime)) { $runtime = 'python' }
-$gpuHome = Join-Path $env:LOCALAPPDATA 'RAGKnowledgeBase'
-$gpuVenv = Join-Path $gpuHome 'gpu-venv'
+$gpuVenv = Join-Path $PSScriptRoot 'gpu-venv'
 $python = Join-Path $gpuVenv 'Scripts\python.exe'
 if (-not (Test-Path -LiteralPath $python)) {
-    New-Item -ItemType Directory -Path $gpuHome -Force | Out-Null
     & $runtime -m venv $gpuVenv
     if ($LASTEXITCODE -ne 0) { throw 'Could not create the GPU environment.' }
 }

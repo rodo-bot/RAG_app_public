@@ -54,6 +54,18 @@ class SearchTests(unittest.TestCase):
         self.assertEqual(results[0]["page_number"], 3)
         self.assertEqual(results[0]["match_type"], "keyword_evidence")
 
+    def test_keyword_fallback_rejects_single_generic_term(self):
+        results = self.search.search(
+            "Audit architecture operational requirements indexing failures duplicate revisions"
+        )
+        self.assertEqual(results, [])
+
+    def test_keyword_fallback_requires_identifier_when_question_contains_one(self):
+        results = self.search.search(
+            "Why does ItemErrorCntAlarm come on and off in System Platform?"
+        )
+        self.assertEqual(results, [])
+
     def test_build_analysis_context_returns_source_evidence(self):
         payload = self.search.build_analysis_context("Explain the phase fail alarm")
         self.assertEqual(payload["evidence_pages"][0]["page"], 3)
