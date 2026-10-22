@@ -5,9 +5,17 @@ import sys
 from pathlib import Path
 
 
+APP_NAME = "RAG Knowledge Base"
+
+
 def _application_root() -> Path:
     """Return the portable app folder in source and packaged builds."""
     if getattr(sys, "frozen", False):
+        if sys.platform == "darwin":
+            # A macOS .app bundle is read-only after installation and signing.
+            # Keep the shared desktop/MCP runtime state in the standard writable
+            # per-user Application Support directory instead.
+            return Path.home() / "Library" / "Application Support" / APP_NAME
         return Path(sys.executable).resolve().parent
     return Path(__file__).resolve().parent.parent
 

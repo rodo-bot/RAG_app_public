@@ -53,6 +53,7 @@ class RAGDB(KnowledgeDB):
         self._embedder = embedder
         self._requested_device = embedding_device or _embedding_device()
         self.embedding_backend = "injected" if embedder is not None else "not_loaded"
+        self._sqlite_vec_available: bool | None = None
         super().__init__(path)
         self.initialize_vectors()
 
@@ -62,11 +63,24 @@ class RAGDB(KnowledgeDB):
         try:
             connection.row_factory = sqlite3.Row
             connection.execute("PRAGMA foreign_keys=ON")
-            connection.enable_load_extension(True)
-            try:
-                sqlite_vec.load(connection)
-            finally:
-                connection.enable_load_extension(False)
+            if self._sqlite_vec_available is not False:
+                enable_extension = getattr(connection, "enable_load_extension", None)
+                if enable_extension is None:
+                    self._sqlite_vec_available = False
+                    LOGGER.warning("SQLite extensions are unavailable; using NumPy vector search")
+                else:
+                    try:
+                        enable_extension(True)
+                        sqlite_vec.load(connection)
+                        self._sqlite_vec_available = True
+                    except (AttributeError, OSError, sqlite3.Error) as exc:
+                        self._sqlite_vec_available = False
+                        LOGGER.warning("sqlite-vec is unavailable; using NumPy vector search: %s", exc)
+                    finally:
+                        try:
+                            enable_extension(False)
+                        except (AttributeError, sqlite3.Error):
+                            pass
             yield connection
             connection.commit()
         except Exception:
@@ -97,10 +111,21 @@ class RAGDB(KnowledgeDB):
                     chunk_count INTEGER NOT NULL,
                     completed_at TEXT NOT NULL
                 );
-                CREATE VIRTUAL TABLE IF NOT EXISTS rag_vectors USING vec0(
-                    embedding float[384] distance_metric=cosine
-                );
             """)
+            if self._sqlite_vec_available:
+                connection.execute(
+                    "CREATE VIRTUAL TABLE IF NOT EXISTS rag_vectors USING "
+                    "vec0(embedding float[384] distance_metric=cosine)"
+                )
+            else:
+                connection.execute(
+                    "CREATE TABLE IF NOT EXISTS rag_vectors_fallback ("
+                    "rowid INTEGER PRIMARY KEY, embedding BLOB NOT NULL)"
+                )
+
+    @property
+    def _vector_table(self) -> str:
+        return "rag_vectors" if self._sqlite_vec_available else "rag_vectors_fallback"
 
     def embedding_state_map(self) -> dict[int, tuple[str, str]]:
         with self.connect() as connection:
@@ -161,7 +186,10 @@ class RAGDB(KnowledgeDB):
                     (document_id,),
                 )
             ]
-            connection.executemany("DELETE FROM rag_vectors WHERE rowid=?", ((chunk_id,) for chunk_id in chunk_ids))
+            connection.executemany(
+                f"DELETE FROM {self._vector_table} WHERE rowid=?",
+                ((chunk_id,) for chunk_id in chunk_ids),
+            )
             connection.execute(
                 "DELETE FROM rag_chunks WHERE page_id IN (SELECT id FROM pages WHERE document_id=?)",
                 (document_id,),
@@ -221,7 +249,7 @@ class RAGDB(KnowledgeDB):
                         (page_id, ordinal, content),
                     )
                     connection.execute(
-                        "INSERT INTO rag_vectors(rowid,embedding) VALUES(?,?)",
+                        f"INSERT INTO {self._vector_table}(rowid,embedding) VALUES(?,?)",
                         (cursor.lastrowid, packed.tobytes()),
                     )
             if timings is not None:
@@ -253,13 +281,42 @@ class RAGDB(KnowledgeDB):
         if packed.shape != (VECTOR_DIMENSIONS,):
             raise ValueError("Query embedding has the wrong dimensions")
         with self.vector_connection() as connection:
-            nearest = connection.execute(
-                "SELECT rowid,distance FROM rag_vectors WHERE embedding MATCH ? AND k=?",
-                (packed.tobytes(), max(1, min(limit, 200))),
-            ).fetchall()
+            result_limit = max(1, min(limit, 200))
+            if self._sqlite_vec_available:
+                nearest = [
+                    (int(row["rowid"]), float(row["distance"]))
+                    for row in connection.execute(
+                        "SELECT rowid,distance FROM rag_vectors WHERE embedding MATCH ? AND k=?",
+                        (packed.tobytes(), result_limit),
+                    ).fetchall()
+                ]
+            else:
+                stored = connection.execute(
+                    "SELECT rowid,embedding FROM rag_vectors_fallback"
+                ).fetchall()
+                valid = [
+                    (int(row["rowid"]), np.frombuffer(row["embedding"], dtype=np.float32))
+                    for row in stored
+                    if len(row["embedding"]) == VECTOR_DIMENSIONS * np.dtype(np.float32).itemsize
+                ]
+                if not valid:
+                    return []
+                matrix = np.vstack([vector for _, vector in valid])
+                denominator = np.linalg.norm(matrix, axis=1) * np.linalg.norm(packed)
+                similarity = np.divide(
+                    matrix @ packed,
+                    denominator,
+                    out=np.zeros(len(valid), dtype=np.float32),
+                    where=denominator != 0,
+                )
+                distances = 1.0 - similarity
+                nearest = [
+                    (valid[int(index)][0], float(distances[int(index)]))
+                    for index in np.argsort(distances)[:result_limit]
+                ]
             if not nearest:
                 return []
-            ids = [int(row["rowid"]) for row in nearest]
+            ids = [rowid for rowid, _ in nearest]
             placeholders = ",".join("?" for _ in ids)
             metadata = {
                 int(row["id"]): dict(row)
@@ -270,8 +327,11 @@ class RAGDB(KnowledgeDB):
                     ids,
                 )
             }
-            return [{**metadata[int(row["rowid"])], "distance": float(row["distance"])}
-                    for row in nearest if int(row["rowid"]) in metadata and row["distance"] is not None]
+            return [
+                {**metadata[rowid], "distance": distance}
+                for rowid, distance in nearest
+                if rowid in metadata
+            ]
 
     def stats(self) -> dict[str, int]:
         result = super().stats()
