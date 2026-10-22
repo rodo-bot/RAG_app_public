@@ -1,0 +1,75 @@
+name: macOS build
+
+on:
+  push:
+    branches:
+      - main
+      - "feature/**"
+    tags:
+      - "v*"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test-and-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            architecture: arm64
+          - runner: macos-15-intel
+            architecture: x86_64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        working-directory: src
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --disable-pip-version-check --upgrade pip
+          .venv/bin/python -m pip install --disable-pip-version-check -r requirements.txt pyinstaller
+      - name: Run tests
+        working-directory: src
+        run: .venv/bin/python -m unittest discover -s tests -v
+      - name: Build macOS app and MCP server
+        working-directory: src
+        run: |
+          chmod +x build_macos.sh
+          ./build_macos.sh
+      - name: Package build
+        working-directory: src
+        run: |
+          package="RAG-Knowledge-Base-macOS-${{ matrix.architecture }}"
+          mkdir -p "$package"
+          cp -R "dist/RAG Knowledge Base.app" "$package/"
+          cp "dist/RAG Knowledge Base MCP" "$package/"
+          cp MACOS_README.md "$package/README.md"
+          cp LLM_INSTRUCTIONS.md "$package/"
+          ditto -c -k --sequesterRsrc --keepParent "$package" "$package.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RAG-Knowledge-Base-macOS-${{ matrix.architecture }}
+          path: src/RAG-Knowledge-Base-macOS-${{ matrix.architecture }}.zip
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: RAG-Knowledge-Base-macOS-*
+          path: artifacts
+          merge-multiple: true
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" artifacts/*.zip --generate-notes

@@ -41,6 +41,7 @@ src/Output/
 src/Sync Library/*
 !src/Sync Library/.gitkeep
 src/.venv/
+src/.test-artifacts/
 *.exe
 *.lnk
 *.spec

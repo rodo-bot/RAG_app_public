@@ -48,6 +48,12 @@ CUDA environment in `gpu-venv`, and their base interpreter in
 runtime relationships; update the absolute MCP configuration path if the
 folder itself is moved.
 
+On macOS, a packaged `.app` keeps writable runtime components in
+`~/Library/Application Support/RAG Knowledge Base` because an installed and
+signed application bundle must not be modified. The macOS desktop app and MCP
+executable share the `Sync Library`, `data`, `models`, and `settings.json` in
+that directory. Source checkouts continue to use the folders beside the code.
+
 ## Connect an LLM
 
 For a standalone guide to give an LLM, see **`LLM_INSTRUCTIONS.md`**. It explains which MCP tools to call and why the original documents, rather than `knowledge.db`, are the source of truth.
