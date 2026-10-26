@@ -2,6 +2,9 @@
 
 Newest changes at the top. Plain English, one line per change.
 
+## 2026-10-26
+- Fixed tagged builds so GitHub can automatically publish the completed macOS ZIP files as a Release.
+
 ## 2026-10-22
 - Added native macOS setup and launch scripts, Apple silicon and Intel build automation, a writable Application Support location, and a compatible vector-search fallback for macOS Python builds that cannot load SQLite extensions.
 - Updated the app with your cleaned-up version: stricter keyword search (fewer irrelevant pages), search falls back to keyword results if the meaning-based search fails, and new tests for both.
