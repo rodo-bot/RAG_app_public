@@ -8,6 +8,8 @@ A local knowledge base for PDF, Word, Excel, CSV and image files. It indexes you
 ## Install and run
 
 ### Windows
+There is no ready-made Windows download yet; you run it from the source. You need [Python](https://www.python.org/downloads/windows/) installed first (the tests run on Python 3.12). On this page, click **Code → Download ZIP**, unzip it, then:
+
 1. Open the `src` folder (this is the whole app).
 2. Run `setup.ps1` once (creates the Python environment and downloads the search model). For an NVIDIA GPU, also run `setup_gpu.ps1`.
 3. Run `build_app.ps1` to create `RAG Knowledge Base.exe`, or just run `run_app.ps1`.
