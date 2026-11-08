@@ -37,3 +37,6 @@ Not supported yet.
 - OCR needs Tesseract. Install it from https://github.com/UB-Mannheim/tesseract/wiki, or copy a portable Tesseract into `src\tools\tesseract` (not stored in GitHub, about 112 MB).
 - The optional GPU environment (`gpu-venv`) is created by `setup_gpu.ps1` inside the app folder.
 - Tests: run `python -m unittest discover -s tests` from `src`.
+
+## License
+MIT. You are free to view, copy, download, modify and share this code. See `LICENSE`.
