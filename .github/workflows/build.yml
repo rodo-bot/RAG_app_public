@@ -53,6 +53,7 @@ jobs:
           cp "dist/RAG Knowledge Base MCP" "$package/"
           cp MACOS_README.md "$package/README.md"
           cp LLM_INSTRUCTIONS.md "$package/"
+          cp ../docs/PREREQUISITES.md "$package/"
           ditto -c -k --sequesterRsrc --keepParent "$package" "$package.zip"
       - uses: actions/upload-artifact@v7
         with:
@@ -96,6 +97,7 @@ jobs:
           Copy-Item -LiteralPath 'dist\RAG Knowledge Base MCP.exe' -Destination $package
           Copy-Item -LiteralPath 'WINDOWS_README.md' -Destination "$package\README.md"
           Copy-Item -LiteralPath 'LLM_INSTRUCTIONS.md' -Destination $package
+          Copy-Item -LiteralPath '..\docs\PREREQUISITES.md' -Destination $package
           Compress-Archive -Path $package -DestinationPath "$package.zip"
       - uses: actions/upload-artifact@v7
         with:

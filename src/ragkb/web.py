@@ -262,7 +262,7 @@ INDEX_HTML = r'''<!doctype html>
     </section>
     <section class="stats" id="stats"></section>
     <section id="searchView">
-      <div class="llm-note"><strong>Sync here. Analyze in Codex.</strong><span>Documents are indexed locally with exact text and semantic vectors. The LLM reads source evidence through this app's MCP tools.</span></div>
+      <div class="llm-note"><strong>Sync here. Analyze with your AI assistant.</strong><span>Documents are indexed locally with exact text and semantic vectors. The LLM reads source evidence through this app's MCP tools.</span></div>
       <form id="searchForm" class="search-box">
         <span class="search-icon">⌕</span>
         <input id="query" autocomplete="off" placeholder="Try: PUMP 1 PHASE FAIL, LIT 0101, RedLion, tank level...">

@@ -7,6 +7,8 @@ A local knowledge base for PDF, Word, Excel, CSV and image files. It indexes you
 
 ## Install and run
 
+Not sure what you need first? See [Prerequisites](docs/PREREQUISITES.md).
+
 ### Windows
 
 #### Downloadable app

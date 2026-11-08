@@ -21,3 +21,5 @@ Optional OCR requires Tesseract. With Homebrew installed, run:
 ```bash
 brew install tesseract
 ```
+
+`PREREQUISITES.md` in this folder lists everything you need.
