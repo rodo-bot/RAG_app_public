@@ -42,7 +42,7 @@ Not supported yet.
 ## Notes
 - The sync folder is **`src\Sync Library`**, inside the app's own folder. It starts empty and is not stored in GitHub, and neither are the database (`src\data`), model cache, or built `.exe` files; they are created on your computer.
 - A packaged macOS app stores its writable files in `~/Library/Application Support/RAG Knowledge Base`. The desktop app and MCP executable share that location.
-- Full guide: `docs/APP_GUIDE.md`. Instructions for AI assistants: `src/LLM_INSTRUCTIONS.md`.
+- Full guide: `docs/APP_GUIDE.md`. Instructions for AI assistants (any AI tool): `AGENTS.md` for working on this repository, and `src/LLM_INSTRUCTIONS.md` for using the knowledge base.
 - OCR needs Tesseract. Install it from https://github.com/UB-Mannheim/tesseract/wiki, or copy a portable Tesseract into `src\tools\tesseract` (not stored in GitHub, about 112 MB).
 - The optional GPU environment (`gpu-venv`) is created by `setup_gpu.ps1` inside the app folder.
 - Tests: run `python -m unittest discover -s tests` from `src`.
