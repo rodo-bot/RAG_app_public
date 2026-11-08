@@ -5,13 +5,26 @@ Read this file when the user asks you to answer from the **RAG Knowledge Base**.
 ## Which knowledge base to use
 
 - Use the MCP server named **`rag_knowledge_base`**. It is separate from the original **`searchpdfs`** server. When the user requests RAG Knowledge Base, direct your searches to `rag_knowledge_base`, not `searchpdfs` or raw SQLite queries.
-- The MCP server is launched by `RAG Knowledge Base MCP.exe` in this folder. In this Codex workspace it is registered in the parent `.codex/config.toml`.
+- The MCP server is the program `RAG Knowledge Base MCP.exe` (Windows) or `RAG Knowledge Base MCP` (macOS) in the app folder. The user's MCP client must be configured to launch it; see "Connecting a new LLM client" below.
 - The app reads the `Sync Library` folder inside this RAG application folder, including its subfolders. `settings.json` defines that active source folder.
 - This app stores its **own** index in `data/knowledge.db`. The original SearchPDFs database is separate. Each app must be synced separately.
 
 ## Connecting a new LLM client
 
-Reading this folder does not itself create an MCP connection. **Before answering, check whether the `rag_knowledge_base` MCP tools are available.** If they are not, attempt to connect the server when your client supports local STDIO MCP servers and you have access to its configuration. Register `RAG Knowledge Base MCP.exe` as `rag_knowledge_base`; `mcp_config.example.toml` contains the working Codex configuration for this computer. Reload or restart the client if required, then verify the tools are available by calling one.
+Reading this folder does not itself create an MCP connection. **Before answering, check whether the `rag_knowledge_base` MCP tools are available.** If they are not, attempt to connect the server when your client supports local STDIO MCP servers and you have access to its configuration. Register the MCP program as `rag_knowledge_base`, using its full file path. Most MCP clients accept a JSON entry like this (exact file and key names vary by client, and on macOS the command is the path to `RAG Knowledge Base MCP`):
+
+```json
+{
+  "mcpServers": {
+    "rag_knowledge_base": {
+      "command": "C:\\path\\to\\RAG Knowledge Base MCP.exe",
+      "args": []
+    }
+  }
+}
+```
+
+`mcp_config.example.toml` in the repository shows the same settings in TOML for clients that use that format. Reload or restart the client if required, then verify the tools are available by calling one.
 
 **If you cannot connect, tell the user clearly that you could not access the RAG Knowledge Base, why if known, and what setup is needed. Do not pretend to have searched it, use the original `searchpdfs` server as a silent substitute, or query `knowledge.db` directly as a workaround.** A remote client without access to this computer cannot launch the local executable just because it can read this file.
 

@@ -38,7 +38,7 @@ writes still run on the CPU. **Sync timing** shows which stage limits each run.
 - Hybrid search combines lexical and semantic ranks and spreads the first results across documents.
 - Search results and analysis contexts include document names and exact PDF pages, Word sections, spreadsheet rows, or image frames. Use **Inspect source** or `get_source_page` for images and uncertain OCR.
 
-The embedding model is cached in `models`. It has already been downloaded for this installation and runs without a network connection. The application does not use an OpenAI API key, paid embeddings, hosted vector database, or local LLM. It never sends source text to an embedding service.
+The embedding model is cached in `models`. It is downloaded the first time it is needed (an internet connection is required once) and then runs without a network connection. The application does not use an OpenAI API key, paid embeddings, hosted vector database, or local LLM. It never sends source text to an embedding service.
 
 The runtime components are colocated with the application: source documents in
 `Sync Library`, the index and previews in `data`, embeddings in `models`, OCR in
@@ -58,7 +58,7 @@ that directory. Source checkouts continue to use the folders beside the code.
 
 For a standalone guide to give an LLM, see **`LLM_INSTRUCTIONS.md`**. It explains which MCP tools to call and why the original documents, rather than `knowledge.db`, are the source of truth.
 
-The separate MCP server is **RAG Knowledge Base MCP.exe**. This workspace's `.codex/config.toml` has been updated with the `rag_knowledge_base` server. Restart Codex to load it. The example configuration remains in `mcp_config.example.toml` if you use this app from another workspace. It exposes `search_knowledge_base` with `hybrid`, `lexical`, and `semantic` modes, plus `build_analysis_context`, `get_source_page`, `find_entity`, `list_pdf_documents`, and `get_document_outline`. The default for natural-language questions is hybrid search.
+The separate MCP server is **RAG Knowledge Base MCP.exe**. Register it in your AI tool's MCP configuration as `rag_knowledge_base`, using the full path to the file, then restart the tool. A JSON example is in `LLM_INSTRUCTIONS.md`, and `mcp_config.example.toml` shows the same settings in TOML. It exposes `search_knowledge_base` with `hybrid`, `lexical`, and `semantic` modes, plus `build_analysis_context`, `get_source_page`, `find_entity`, `list_pdf_documents`, and `get_document_outline`. The default for natural-language questions is hybrid search.
 
 The new database starts empty. An LLM can query it after a sync has indexed documents. The original SearchPDFs MCP server remains separate.
 

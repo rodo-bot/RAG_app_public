@@ -23,3 +23,5 @@ AI assistant should use it.
 
 Optional OCR (reading scanned pages and images) needs Tesseract. Install it
 from https://github.com/UB-Mannheim/tesseract/wiki.
+
+`PREREQUISITES.md` in this folder lists everything you need.

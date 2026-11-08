@@ -3,6 +3,8 @@
 Newest changes at the top. Plain English, one line per change.
 
 ## 2026-11-07
+- Added a single Prerequisites page (`docs/PREREQUISITES.md`) listing what you need for the Windows download, the Mac download, running from source, OCR, and connecting an AI assistant. It is linked from the README and included in each download.
+- Reworded the AI instructions and the app guide so they no longer refer to one particular AI tool or to the author's own workspace, added a JSON example of how to register the MCP server, and corrected the note about when the search model is downloaded.
 - Removed the `CLAUDE.md` file from the public copy so the AI instructions are not tied to one assistant; `AGENTS.md` (the tool-neutral name) stays, and the README now points to it.
 - Added a ready-to-run Windows download (the app and the MCP server as `.exe` files in one ZIP). The automatic build now makes it for Windows and attaches it to each Release next to the Mac downloads, and the build is simply called "Build" now.
 - The automatic build can now attach the Mac ZIP files to a Release that already exists, so a Release can be published from the GitHub website without the build failing.
