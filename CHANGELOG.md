@@ -3,6 +3,7 @@
 Newest changes at the top. Plain English, one line per change.
 
 ## 2026-11-07
+- Removed the `CLAUDE.md` file from the public copy so the AI instructions are not tied to one assistant; `AGENTS.md` (the tool-neutral name) stays, and the README now points to it.
 - Added a ready-to-run Windows download (the app and the MCP server as `.exe` files in one ZIP). The automatic build now makes it for Windows and attaches it to each Release next to the Mac downloads, and the build is simply called "Build" now.
 - The automatic build can now attach the Mac ZIP files to a Release that already exists, so a Release can be published from the GitHub website without the build failing.
 - Clarified in the README that Windows needs Python installed and that there is no ready-made Windows download yet.
