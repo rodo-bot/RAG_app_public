@@ -2,6 +2,11 @@
 
 Newest changes at the top. Plain English, one line per change.
 
+## 2026-11-07
+- Added an open-source MIT license so anyone can view, copy, download and reuse the code.
+- Replaced example equipment tags and a drawing number in the tests and the search box hint with generic ones, and removed the author's personal email address from the project history.
+- Tightened the automatic build so it can only publish a Release when a version tag is pushed; ordinary builds are now read-only.
+
 ## 2026-10-26
 - Fixed tagged builds so GitHub can automatically publish the completed macOS ZIP files as a Release.
 
