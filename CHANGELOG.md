@@ -2,6 +2,9 @@
 
 Newest changes at the top. Plain English, one line per change.
 
+## 2026-11-11
+- Removed GitHub Actions. The automatic Windows/Mac builds no longer run on GitHub, so download links now come only from Releases you upload by hand (or run the app from source).
+
 ## 2026-11-07
 - Added a single Prerequisites page (`docs/PREREQUISITES.md`) listing what you need for the Windows download, the Mac download, running from source, OCR, and connecting an AI assistant. It is linked from the README and included in each download.
 - Reworded the AI instructions and the app guide so they no longer refer to one particular AI tool or to the author's own workspace, added a JSON example of how to register the MCP server, and corrected the note about when the search model is downloaded. The hint at the top of the app's search page now says "Analyze with your AI assistant" instead of naming one tool.

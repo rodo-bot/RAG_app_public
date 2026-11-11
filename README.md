@@ -27,7 +27,7 @@ You need [Python](https://www.python.org/downloads/windows/) installed first (th
 ### macOS
 
 #### Downloadable app
-1. Open the repository's **Actions** page and select a successful **Build** run, or download a tagged version from **Releases**.
+1. Open **Releases** and download the Mac ZIP if one has been published (GitHub does not build it automatically). If there is none, use *Run from source* below.
 2. Download the ZIP matching the Mac: `arm64` for Apple silicon (M1 or newer), or `x86_64` for an Intel Mac.
 3. Unzip it and move **RAG Knowledge Base.app** to Applications. Because the build is not notarized with an Apple Developer certificate, first launch it by Control-clicking the app, choosing **Open**, and confirming.
 4. Put documents in `~/Library/Application Support/RAG Knowledge Base/Sync Library`, open the app, and click **Sync Library**.
